@@ -1,0 +1,16 @@
+<launch>
+  <rosparam command="load" file="$(find simtrack_nodes)/config/parameters.yaml"/>
+  <param name="simtrack/use_compressed_streams" value="false" />
+  <param name="simtrack/tracker/color_only_mode" value="false" />
+
+  <rosparam command="load" file="$(find simtrack_nodes)/config/demo_objects.yaml"/>
+  <param name="simtrack/model_path" value="$(find simtrack_nodes)/../data/object_models"/>
+
+  <node name="simtrack" pkg="simtrack_nodes" type="multi_rigid_node" output="screen">
+  <remap from="rgb" to="/camera/rgb/image_rect_color" />
+  <remap from="rgb/compressed" to="/camera/rgb/image_rect_color/compressed/" />
+  <remap from="rgb_info" to="/camera/rgb/camera_info" />
+  <remap from="depth" to="/camera/depth_registered/image_raw" />
+  <remap from="depth/compressedDepth" to="/camera/depth_registered/image_raw/compressedDepth" />
+  </node>
+</launch>

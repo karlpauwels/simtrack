@@ -1,0 +1,28 @@
+simtrack/tracker/device_id: 0
+simtrack/detector/device_id: 1
+
+simtrack/optical_flow/n_scales: 0 # 0=auto
+simtrack/optical_flow/median_filter: true
+simtrack/optical_flow/consistent: true
+simtrack/optical_flow/cons_thres: 0.5
+simtrack/optical_flow/four_orientations: false
+
+simtrack/detector/vec_size: 4
+simtrack/detector/num_iter_ransac: 1000
+
+simtrack/tracker/color_only_mode: false
+simtrack/tracker/n_icp_outer_it: 3
+simtrack/tracker/n_icp_inner_it: 3
+simtrack/tracker/w_flow: 1.0
+simtrack/tracker/w_ar_flow: 1.0
+simtrack/tracker/w_disp: 1.0 # ignored in color_only_mode
+simtrack/tracker/max_samples: 500000
+simtrack/tracker/key_bits: 4
+simtrack/tracker/near_plane: 0.001
+simtrack/tracker/far_plane: 10.0
+
+simtrack/tracker/reliability_threshold: 0.15
+simtrack/tracker/sparse_intro_reliability_threshold: 0.30
+simtrack/tracker/sparse_intro_allowed_reliability_decrease: 0.02
+simtrack/tracker/max_proportion_projected_bounding_box: 10.0
+simtrack/tracker/max_t_update_norm_squared: 0.04

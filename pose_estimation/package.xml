@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package>
+  <name>pose_estimation</name>
+  <version>0.1.0</version>
+  <description>Pose Estimation Engine</description>
+  <maintainer email="karlpauwels@users.noreply.github.com">Karl Pauwels</maintainer>
+  <license>BSD</license>
+  <url type="website">http://www.karlpauwels.com/simtrack</url>
+  <author email="karlpauwels@users.noreply.github.com">Karl Pauwels</author>
+  <maintainer email="karlpauwels@users.noreply.github.com">Karl Pauwels</maintainer>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>cmake_modules</build_depend>
+  <build_depend>eigen</build_depend>
+  <build_depend>siftgpu</build_depend>
+  <build_depend>rendering</build_depend>
+  <build_depend>utilities</build_depend>
+
+  <run_depend>siftgpu</run_depend>
+  <run_depend>rendering</run_depend>
+  <run_depend>utilities</run_depend>
+
+</package>

@@ -1,0 +1,10 @@
+# Blender MTL File: 'ros_groovy.blend'
+# Material Count: 1
+newmtl _ros_hydro.jpg
+Ns 0
+Ka 0.000000 0.000000 0.000000
+Kd 0.8 0.8 0.8
+Ks 0.8 0.8 0.8
+d 1
+illum 2
+map_Kd ros_hydro_texture.jpg

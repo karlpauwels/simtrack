@@ -1,0 +1,28 @@
+<launch>
+  <rosparam command="load" file="$(find simtrack_nodes)/config/parameters.yaml"/>
+  <param name="simtrack/use_compressed_streams" value="false" />
+  <param name="simtrack/tracker/color_only_mode" value="false" />
+
+  <rosparam command="load" file="$(find simtrack_nodes)/config/demo_objects.yaml"/>
+  <param name="simtrack/model_path" value="$(find simtrack_nodes)/../data/object_models"/>
+
+  <!--low-res mode-->
+<!--
+  <node name="simtrack" pkg="simtrack_nodes" type="multi_rigid_node" output="screen">
+  <remap from="rgb" to="/kinect2_head/rgb_lowres/image" />
+  <remap from="rgb/compressed" to="/kinect2_head/rgb_lowres/image/compressed/" />
+  <remap from="rgb_info" to="/kinect2_head/rgb_lowres/camera_info" />
+  <remap from="depth" to="/kinect2_head/depth_lowres/image" />
+  <remap from="depth/compressedDepth" to="/kinect2_head/depth_lowres/image/compressedDepth" />
+  </node>
+-->
+
+  <!--hi-res mode-->
+  <node name="simtrack" pkg="simtrack_nodes" type="multi_rigid_node" output="screen">
+  <remap from="rgb" to="/kinect2_head/mono_rect/image" />
+  <remap from="rgb/compressed" to="/kinect2_head/mono_rect/image/compressed/" />
+  <remap from="rgb_info" to="/kinect2_head/mono_rect/camera_info" />
+  <remap from="depth" to="/kinect2_head/depth_highres/image" />
+  <remap from="depth/compressedDepth" to="/kinect2_head/depth_highres/image/compressedDepth" />
+  </node>
+</launch>

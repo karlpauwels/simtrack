@@ -1,0 +1,24 @@
+<package>
+  <name>simtrack</name>
+  <version>0.1.0</version>
+  <description>A simulation-based framework for tracking</description>
+  <license>BSD</license>
+  <url type="website">http://www.karlpauwels.com/simtrack</url>
+  <author email="karl.pauwels@outlook.com">Karl Pauwels</author>
+  <maintainer email="karl.pauwels@outlook.com">Karl Pauwels</maintainer>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>interface</run_depend>
+  <run_depend>low_level_vision</run_depend>
+  <run_depend>pose_estimation</run_depend>
+  <run_depend>rendering</run_depend> 
+  <run_depend>siftgpu</run_depend>
+  <run_depend>simtrack_nodes</run_depend>
+  <run_depend>utilities</run_depend>
+
+  <export>
+    <metapackage/>
+  </export>
+
+</package>

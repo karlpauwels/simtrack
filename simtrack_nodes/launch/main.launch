@@ -1,0 +1,4 @@
+<launch>
+  <include file="$(find simtrack_nodes)/launch/camera_xtion.launch"/>
+  <include file="$(find simtrack_nodes)/launch/multi-rigid.launch"/>
+</launch>

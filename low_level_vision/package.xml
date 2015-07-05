@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package>
+  <name>low_level_vision</name>
+  <version>0.1.0</version>
+  <description>Low-level Vision Engine</description>
+  <license>BSD</license>
+  <url type="website">http://www.karlpauwels.com/simtrack</url>
+  <author email="karlpauwels@users.noreply.github.com">Karl Pauwels</author>
+  <maintainer email="karlpauwels@users.noreply.github.com">Karl Pauwels</maintainer>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>utilities</build_depend>
+  <run_depend>utilities</run_depend>
+</package>

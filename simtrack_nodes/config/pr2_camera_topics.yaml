@@ -1,0 +1,15 @@
+camera/0/color_only_mode: false
+camera/0/rgb: /head_mount_kinect/rgb/image_rect_color
+camera/0/rgb_info: /head_mount_kinect/rgb/camera_info
+camera/0/depth: /head_mount_kinect/depth_registered/sw_registered/image_rect_raw
+camera/0/robot_frame: head_mount_kinect_rgb_optical_frame
+
+camera/1/color_only_mode: true
+camera/1/rgb: /l_forearm_cam/image_rect_color
+camera/1/rgb_info: /l_forearm_cam/camera_info
+camera/1/robot_frame: l_forearm_cam_optical_frame
+
+camera/2/color_only_mode: true
+camera/2/rgb: /r_forearm_cam/image_rect_color
+camera/2/rgb_info: /r_forearm_cam/camera_info
+camera/2/robot_frame: r_forearm_cam_optical_frame

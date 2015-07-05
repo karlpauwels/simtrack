@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package>
+  <name>siftgpu</name>
+  <version>0.1.0</version>
+  <description>Catkinized SiftGPU (CUDA version)</description>
+  <license>non-profit license University of North Carolina</license>
+  <url type="website">http://cs.unc.edu/~ccwu/siftgpu/</url>
+  <author email="ccwu@cs.unc.edu">Changchang Wu</author>
+  <maintainer email="karlpauwels@users.noreply.github.com">Karl Pauwels</maintainer>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>libglew-dev</build_depend>
+  <run_depend>libglew-dev</run_depend>
+</package>

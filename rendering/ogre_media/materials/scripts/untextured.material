@@ -1,0 +1,32 @@
+vertex_program untextured_vert glsl
+{
+  source ../glsl/untextured.vert
+}
+
+fragment_program untextured_frag glsl
+{
+  source ../glsl/untextured.frag
+}
+
+material untextured
+{
+  technique
+  {
+    scheme MRT
+    
+    pass
+    {
+    # culling is required on the robot since the cameras are inside a structure!
+    # cull_hardware none
+      vertex_program_ref untextured_vert
+      {
+        param_named_auto worldViewProj worldviewproj_matrix
+        param_named_auto invTraWorldView inverse_transpose_worldview_matrix
+        param_named_auto segmentIndex custom 1
+      }
+      fragment_program_ref untextured_frag
+      {
+      }
+    }
+  }
+}

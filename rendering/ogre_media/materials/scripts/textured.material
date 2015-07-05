@@ -1,0 +1,31 @@
+vertex_program textured_vert glsl
+{
+  source ../glsl/textured.vert
+}
+
+fragment_program textured_frag glsl
+{
+  source ../glsl/textured.frag
+}
+
+material textured
+{
+  technique
+  {
+    scheme MRT
+    
+    pass
+    {
+      cull_hardware none
+      vertex_program_ref textured_vert
+      {
+        param_named_auto worldViewProj worldviewproj_matrix
+        param_named_auto invTraWorldView inverse_transpose_worldview_matrix
+        param_named_auto segmentIndex custom 1
+      }
+      fragment_program_ref textured_frag
+      {
+      }
+    }
+  }
+}

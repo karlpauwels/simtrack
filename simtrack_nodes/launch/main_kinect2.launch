@@ -1,0 +1,4 @@
+<launch>
+  <include file="$(find simtrack_nodes)/launch/camera_kinect2.launch"/>
+  <include file="$(find simtrack_nodes)/launch/multi-rigid_kinect2.launch"/>
+</launch>
