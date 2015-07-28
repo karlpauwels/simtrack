@@ -10,6 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   message_generation
   tf
+  geometry_msgs
   interface
 )
 
@@ -40,7 +41,7 @@ catkin_package(
   INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}
   DEPENDS cv_bridge
-  CATKIN_DEPENDS image_transport tf message_runtime interface
+  CATKIN_DEPENDS image_transport tf geometry_msgs message_runtime interface
 )
 
 # show additional files in qtcreator
