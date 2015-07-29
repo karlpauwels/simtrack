@@ -134,7 +134,8 @@ MultiRigidNode::MultiRigidNode(ros::NodeHandle nh)
   for (auto &it : model_names) {
     objects_.push_back(composeObjectInfo(it));
     obj_filenames_.push_back(composeObjectFilename(it));
-    pose_publishers_[it] = nh.advertise<geometry_msgs::PoseStamped>("/simtrack/"+it, 1);
+    pose_publishers_[it] =
+        nh.advertise<geometry_msgs::PoseStamped>("/simtrack/" + it, 1);
   }
 
   // get optical flow parameters
@@ -416,7 +417,8 @@ void MultiRigidNode::updatePose(const cv_bridge::CvImagePtr &cv_rgb_ptr,
         curr_pose_stamped.pose = curr_pose;
         curr_pose_stamped.header.frame_id = frame_id;
         curr_pose_stamped.header.stamp = cv_rgb_ptr->header.stamp;
-        pose_publishers_[objects_.at(object_index).label_].publish(curr_pose_stamped);
+        pose_publishers_[objects_.at(object_index).label_]
+            .publish(curr_pose_stamped);
       }
     }
 
