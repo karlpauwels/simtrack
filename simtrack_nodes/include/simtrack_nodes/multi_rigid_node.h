@@ -46,6 +46,7 @@
 #include <sensor_msgs/Image.h>
 #include <std_msgs/Int32.h>
 #include <tf/transform_broadcaster.h>
+#include <geometry_msgs/PoseStamped.h>
 #include <multi_rigid_tracker.h>
 #include <multi_rigid_detector.h>
 #include <dynamic_reconfigure/server.h>
@@ -156,6 +157,7 @@ private:
   boost::shared_ptr<image_transport::ImageTransport> debug_img_it_;
   image_transport::Publisher debug_img_pub_;
   tf::TransformBroadcaster tfb_;
+  std::map<std::string, ros::Publisher> pose_publishers_;
 
   // Subscriptions
   ros::Subscriber sub_detector_pose_;
