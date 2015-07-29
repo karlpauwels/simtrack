@@ -41,7 +41,6 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <simtrack_nodes/multi_rigid_node.h>
-#include <tf/transform_datatypes.h>
 #include <windowless_gl_context.h>
 #undef Success
 #include <Eigen/Geometry>
@@ -135,7 +134,7 @@ MultiRigidNode::MultiRigidNode(ros::NodeHandle nh)
   for (auto &it : model_names) {
     objects_.push_back(composeObjectInfo(it));
     obj_filenames_.push_back(composeObjectFilename(it));
-    pose_publishers_[it] = nh.advertise<geometry_msgs::PoseStamped>("/simtrack/"+it, 1);;
+    pose_publishers_[it] = nh.advertise<geometry_msgs::PoseStamped>("/simtrack/"+it, 1);
   }
 
   // get optical flow parameters
