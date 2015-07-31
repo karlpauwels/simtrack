@@ -3,7 +3,7 @@ SimTrack
 
 [SimTrack](http://www.karlpauwels.com/simtrack), a simulation-based framework for tracking, is a [ROS](http://www.ros.org/)-package for detecting and tracking the pose of multiple (textured) rigid objects in real-time. SimTrack is released under the [BSD-license](http://opensource.org/licenses/BSD-3-Clause). Please cite the following paper if you use SimTrack in your research:
 
-*Pauwels, Karl and Kragic, Danica (2015) SimTrack: A Simulation-based Framework for Scalable Real-time Object Pose Detection and Tracking. IEEE/RSJ International Conference on Intelligent Robots and Systems, Hamburg, Germany, 2015.*
+*Pauwels, Karl and Kragic, Danica (2015) [SimTrack: A Simulation-based Framework for Scalable Real-time Object Pose Detection and Tracking](http://www.karlpauwels.com/downloads/iros_2015/Pauwels_IROS_2015.pdf). IEEE/RSJ International Conference on Intelligent Robots and Systems, Hamburg, Germany, 2015.*
 
 For more details see the following paper: 
 
