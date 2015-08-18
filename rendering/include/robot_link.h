@@ -49,6 +49,8 @@ public:
 
   void setSegmentIndex(int segment_ind);
 
+  void setVisible(bool visible);
+
   const std::string getName() { return name_; }
 
 private:
@@ -64,5 +66,7 @@ private:
   std::string name_;
   Ogre::SceneNode *visual_node_;
   int segment_ind_;
+  std::vector<Ogre::Entity *> entities_;
+
 };
 }

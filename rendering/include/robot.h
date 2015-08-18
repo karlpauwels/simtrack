@@ -58,6 +58,9 @@ public:
 
   void setFixedSegmentLabels(int segment_index = 0);
 
+  // enable or disable robot rendering
+  void setVisible(bool visible);
+
 private:
   void
   propagateTree(const KDL::SegmentMap::const_iterator segment,

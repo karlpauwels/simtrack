@@ -63,6 +63,11 @@ void RobotLink::setSegmentIndex(int segment_ind) {
         ->setCustomParameter(1, Ogre::Vector4(segment_ind, 0, 0, 0));
 }
 
+void RobotLink::setVisible(bool visible) {
+  for(auto &it : entities_)
+    it->setVisible(visible);
+}
+
 Ogre::Entity *
 RobotLink::createEntityForVisualElement(const urdf::Visual &visual) {
   Ogre::SceneNode *offset_node = visual_node_->createChildSceneNode();
@@ -133,6 +138,8 @@ RobotLink::createEntityForVisualElement(const urdf::Visual &visual) {
     offset_node->setPosition(offset_position);
     offset_node->setOrientation(offset_orientation);
   }
+
+  entities_.push_back(entity);
 
   return (entity);
 }

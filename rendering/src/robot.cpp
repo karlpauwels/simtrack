@@ -93,6 +93,11 @@ void Robot::setFixedSegmentLabels(int segment_index) {
     it.setSegmentIndex(segment_index);
 }
 
+void Robot::setVisible(bool visible) {
+  for (auto &it : robot_links_)
+    it.setVisible(visible);
+}
+
 void Robot::propagateTree(
     const KDL::SegmentMap::const_iterator segment, const KDL::Frame frame,
     const std::unordered_map<std::string, double> &joint_state) {
