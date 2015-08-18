@@ -71,11 +71,6 @@ public:
   /*! \brief Returns squared norm of rotation vector */
   double normR2() const;
 
-  void applyRigidBodyMotion(TranslationRotation3D TR_rbm);
-  void applyRigidBodyMotion(double *X_out, const double *X_in);
-
-  void applyInverseRigidBodyMotion(TranslationRotation3D TR_rbm);
-
   // convert from left- to right-handed coordinate frame (invertible)
   TranslationRotation3D changeHandedness() const;
 
@@ -89,25 +84,7 @@ public:
 
   Eigen::MatrixXd adjoint() const;
 
-  /**
-   * @brief Apply rotation to V
-   * @param V
-   */
-  void rotateVector(double *V) const;
-
-  /**
-   * @brief Return the pose that takes the current pose towards targetPose
-   *        F_target = delta_F * F_current
-   *        computed as delta_F = F_target * inv(F_current)
-   * @param targetPose
-   * @return delta_F
-   */
-  TranslationRotation3D computeDeltaPose(TranslationRotation3D targetPose);
-
   void createGLModelMatrix(float *M_out) const;
-  void createGLModelMatrixInvRot(float *M_out) const;
-  void createGLViewMatrix(float *M_out) const;
-  void createGLViewMatrixFromCameraMatrix(float *M_out) const;
 
   template <typename Type> void getT(Type *T_out) const {
     for (int i = 0; i < 3; i++)
@@ -126,8 +103,6 @@ public:
 
   void getQuaternion(double &x, double &y, double &z, double &w) const;
 
-  void getINVR_mat(double *INVR_mat_out) const;
-
   /*!
    * \brief return homogeneous transformation matrix (row-major)
    * \param F_out
@@ -139,8 +114,6 @@ public:
   bool isFinite() const;
 
   void getEuler(double &Ex, double &Ey, double &Ez) const;
-
-  std::vector<double> getRobotHomT();
 
   void setT(const double *T_in);
   void setR(const double *R_in);
@@ -167,13 +140,6 @@ public:
   void showCompact() const;
 
 private:
-  /*! \brief Matrix multiply 3x3 */
-  void multiplyMat(double *M_out, double M1[9], double M2[9]);
-
-  /*! \brief Multiply 3x3 with 3x1 */
-  void multiplyMatVec(double *V_out, const double M[9],
-                      const double V[3]) const;
-
   /*! \brief Update R based on R_mat */
   void updateR();
 
@@ -181,6 +147,7 @@ private:
   void updateR_mat();
 
   double T_[3]; // translation
+  // axis-angle representation of rotation
   double R_[3]; // rotation angles (in rad)
 
   double R_mat_[3 * 3]; // rotation matrix
