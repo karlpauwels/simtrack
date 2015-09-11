@@ -54,6 +54,18 @@ TranslationRotation3D::TranslationRotation3D(const double *T_in,
   setR(R_in);
 }
 
+TranslationRotation3D::TranslationRotation3D(Eigen::Vector3d T,
+                                             Eigen::Vector3d R) {
+  double T_in[3];
+  double R_in[3];
+  Eigen::Map<Eigen::Vector3d> T_tmp(T_in);
+  Eigen::Map<Eigen::Vector3d> R_tmp(R_in);
+  T_tmp = T;
+  R_tmp = R;
+  setT(T_in);
+  setR(R_in);
+}
+
 template <typename Type>
 TranslationRotation3D::TranslationRotation3D(const Type TR_in[6])
     : valid_{ true } {
@@ -240,6 +252,17 @@ Ogre::Quaternion TranslationRotation3D::ogreRotation() const {
   return Ogre::Quaternion(w, x, y, z);
 }
 
+Eigen::Vector3d TranslationRotation3D::eigenTranslation() const {
+  Eigen::Map<const Eigen::Vector3d> trans(T_);
+  return trans;
+}
+
+Eigen::Matrix3d TranslationRotation3D::eigenRotation() const {
+  Eigen::Map<const Eigen::Matrix<double, 3, 3, Eigen::RowMajor> > rot_mat(
+      R_mat_);
+  return rot_mat;
+}
+
 Eigen::MatrixXd TranslationRotation3D::adjoint() const {
   double F_ptr[4 * 4];
   Eigen::Map<const Eigen::Matrix<double, 4, 4, Eigen::RowMajor> > F(F_ptr);
@@ -312,11 +335,8 @@ void TranslationRotation3D::getEuler(double &Ex, double &Ey, double &Ez) const {
 }
 
 void TranslationRotation3D::getF(double *F_out) const {
-  Eigen::Map<const Eigen::Matrix<double, 3, 3, Eigen::RowMajor> > rot_mat(
-      R_mat_);
-  Eigen::Map<const Eigen::Vector3d> trans(T_);
   Eigen::Map<Eigen::Matrix<double, 4, 4, Eigen::RowMajor> > hom(F_out);
-  hom << rot_mat, trans, 0.0, 0.0, 0.0, 1.0;
+  hom << eigenRotation(), eigenTranslation(), 0.0, 0.0, 0.0, 1.0;
 }
 
 void TranslationRotation3D::setT(const double *T_in) {

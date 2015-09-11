@@ -48,6 +48,8 @@ public:
 
   TranslationRotation3D(const double *T_in, const double *R_in);
 
+  TranslationRotation3D(Eigen::Vector3d T, Eigen::Vector3d R);
+
   /*!
    * \brief Initialize from 6 element array containing translation and rotation
    * vector
@@ -81,6 +83,10 @@ public:
   Ogre::Vector3 ogreTranslation() const;
 
   Ogre::Quaternion ogreRotation() const;
+
+  Eigen::Vector3d eigenTranslation() const;
+
+  Eigen::Matrix3d eigenRotation() const;
 
   Eigen::MatrixXd adjoint() const;
 
