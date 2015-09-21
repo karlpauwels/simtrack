@@ -69,9 +69,9 @@ int main(int argc, char **argv) {
   if (images_size.size() != 3)
     throw std::runtime_error("Expecting 2D uint8_t images");
 
-  int image_width = images_size.at(2);
-  int image_height = images_size.at(1);
-  int n_images = images_size.at(0);
+  size_t image_width = images_size.at(2);
+  size_t image_height = images_size.at(1);
+  size_t n_images = images_size.at(0);
 
   // default arguments
   bool save_output_images =
@@ -82,7 +82,10 @@ int main(int argc, char **argv) {
   pose::D_MultipleRigidPoses::Parameters pose_parameters;
 
   pose_parameters.w_disp_ = 0.0;
-  pose_parameters.w_flow_ = 0.0;
+//  pose_parameters.w_flow_ = 0.0;
+  pose_parameters.w_flow_ = 1.0;
+
+  pose_parameters.check_reliability_ = false;
 
   std::vector<std::string> tracker_filenames;
 
@@ -108,7 +111,7 @@ int main(int argc, char **argv) {
   }
 
   // allocate output
-  std::vector<int> t_r_out_size{ n_images, n_objects, 3 };
+  std::vector<int> t_r_out_size{ (int)n_images, (int)n_objects, 3 };
   std::vector<double> t_out(3 * n_objects * n_images);
   std::vector<double> r_out(3 * n_objects * n_images);
 
@@ -116,8 +119,9 @@ int main(int argc, char **argv) {
   std::vector<uint8_t> output_images;
 
   if (save_output_images) {
-    output_images_size = { n_images, image_height, image_width, 3 };
-    output_images.resize(n_images * image_height * image_width * 3);
+    output_images_size = { (int)n_images, (int)image_height, (int)image_width, 3 };
+    size_t n_total = n_images * image_height * image_width * 3;
+    output_images.resize(n_total);
   }
 
   /***********/
@@ -139,7 +143,7 @@ int main(int argc, char **argv) {
                                        object_info, flow_parameters,
                                        pose_parameters);
 
-  for (int i = 0; i < n_images; ++i) {
+  for (size_t i = 0; i < n_images; ++i) {
     cv::Mat image(image_height, image_width, CV_8UC1,
                   &images_data.at(image_height * image_width * i));
     int detector_object = i % n_objects;
