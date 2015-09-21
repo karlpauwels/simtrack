@@ -658,7 +658,18 @@ void D_MultipleRigidPoses::computeARFlowPoseError(
     const util::Device1D<float> &d_ar_flowx,
     std::vector<TranslationRotation3D> &poses,
     std::vector<double> &ar_flow_prop_valid) {
+  std::vector<double> ar_flow_abs_valid; // discarded
+  computeARFlowPoseError(d_ar_flowx, poses, ar_flow_prop_valid,
+                         ar_flow_abs_valid);
+}
+
+void D_MultipleRigidPoses::computeARFlowPoseError(
+    const util::Device1D<float> &d_ar_flowx,
+    std::vector<TranslationRotation3D> &poses,
+    std::vector<double> &ar_flow_prop_valid,
+    std::vector<double> &ar_flow_abs_valid) {
   ar_flow_prop_valid.clear();
+  ar_flow_abs_valid.clear();
 
   render(poses);
 
@@ -723,6 +734,7 @@ void D_MultipleRigidPoses::computeARFlowPoseError(
 
   for (int o = 0; o < _n_objects; o++) {
 
+    double absolute_count = (double)_seg_lengths_flow_Zbuffer[o];
     double prop = (_seg_lengths_Zbuffer[o] > 0)
                       ? (double)_seg_lengths_flow_Zbuffer[o] /
                             (double)_seg_lengths_Zbuffer[o]
@@ -765,6 +777,7 @@ void D_MultipleRigidPoses::computeARFlowPoseError(
     }
 
     ar_flow_prop_valid.push_back(prop);
+    ar_flow_abs_valid.push_back(absolute_count);
   }
 }
 

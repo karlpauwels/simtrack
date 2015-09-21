@@ -165,6 +165,18 @@ public:
    * \param d_ar_flowx
    * \param poses: may be invalidated if _checkReliability is set
    * \param ar_flow_prop_valid: the proportion valid AR flow
+   * \param ar_flow_abs_valid: the absolute count of valid AR flow
+   */
+  void computeARFlowPoseError(const util::Device1D<float> &d_ar_flowx,
+                              std::vector<TranslationRotation3D> &poses,
+                              std::vector<double> &ar_flow_prop_valid,
+                              std::vector<double> &ar_flow_abs_valid);
+
+  /*!
+   * \brief computeARFlowPoseError: same as above but discards final argument
+   * \param d_ar_flowx
+   * \param poses
+   * \param ar_flow_prop_valid
    */
   void computeARFlowPoseError(const util::Device1D<float> &d_ar_flowx,
                               std::vector<TranslationRotation3D> &poses,
