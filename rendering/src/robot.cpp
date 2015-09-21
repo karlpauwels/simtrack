@@ -98,6 +98,16 @@ void Robot::setVisible(bool visible) {
     it.setVisible(visible);
 }
 
+void Robot::setVisible(bool visible, std::vector<std::string> link_names) {
+  for (auto &link_it : robot_links_) {
+    link_it.setVisible(!visible); // initialize
+    for (auto &name_it : link_names) {
+      if ( link_it.getName() == name_it )
+        link_it.setVisible(visible);
+    }
+  }
+}
+
 void Robot::propagateTree(
     const KDL::SegmentMap::const_iterator segment, const KDL::Frame frame,
     const std::unordered_map<std::string, double> &joint_state) {

@@ -76,6 +76,14 @@ int main(int argc, char **argv) {
   std::string robot_description =
       in_file.readScalar<std::string>("robot_description");
 
+  // read robot links to make invisible (optional)
+  bool remove_robot_links = in_file.checkVariableExists("links_to_remove");
+  std::vector<std::string> links_to_remove;
+  if (remove_robot_links) {
+    std::vector<int> size_links_to_remove;
+    in_file.readArray("links_to_remove", links_to_remove, size_links_to_remove);
+  }
+
   // read object(s) state
   std::vector<pose::TranslationRotation3D> object_poses;
   std::vector<std::string> obj_file_names;
@@ -174,6 +182,10 @@ int main(int argc, char **argv) {
       joint_state[joint_names.at(i)] = joint_angles.at(i);
 
     robot.setJointState(joint_state);
+
+    // optionally remove robot links
+    if (remove_robot_links)
+      robot.setVisible(false, links_to_remove);
   }
 
   // configure objects (if any)

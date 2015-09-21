@@ -58,8 +58,13 @@ public:
 
   void setFixedSegmentLabels(int segment_index = 0);
 
-  // enable or disable robot rendering
+  // enable or disable complete robot rendering
   void setVisible(bool visible);
+
+  // selectively enable parts of the robot for rendering
+  // all other parts will be ignored
+  void setVisible(bool visible, std::vector<std::string> link_names);
+
 
 private:
   void
