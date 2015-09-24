@@ -77,8 +77,8 @@ private:
   void reconfigureCb(simtrack_nodes::VisualizationConfig &config,
                      uint32_t level);
 
-  void updatePose(const cv_bridge::CvImagePtr &cv_rgb_ptr,
-                  const cv_bridge::CvImagePtr &cv_depth_ptr,
+  void updatePose(const cv_bridge::CvImageConstPtr &cv_rgb_ptr,
+                  const cv_bridge::CvImageConstPtr &cv_depth_ptr,
                   const std::string &frame_id);
 
   void detectorThreadFunction(cv::Mat camera_matrix, size_t width,

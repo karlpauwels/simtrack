@@ -230,8 +230,8 @@ bool MultiRigidNode::start() {
   }
 
   rgb_it_.reset(new image_transport::ImageTransport(nh_));
-  sub_rgb_.subscribe(*rgb_it_, "rgb", 1, rgb_hint);
-  sub_rgb_info_.subscribe(nh_, "rgb_info", 1);
+  sub_rgb_.subscribe(*rgb_it_, "rgb", 2, rgb_hint);
+  sub_rgb_info_.subscribe(nh_, "rgb_info", 2);
 
   if (color_only_mode_) {
     sync_rgb_.reset(
@@ -240,7 +240,7 @@ bool MultiRigidNode::start() {
         boost::bind(&MultiRigidNode::colorOnlyCb, this, _1, _2));
   } else {
     depth_it_.reset(new image_transport::ImageTransport(nh_));
-    sub_depth_.subscribe(*depth_it_, "depth", 1, depth_hint);
+    sub_depth_.subscribe(*depth_it_, "depth", 2, depth_hint);
     sync_rgbd_.reset(new SynchronizerRGBD(SyncPolicyRGBD(5), sub_depth_,
                                           sub_rgb_, sub_rgb_info_));
     sync_rgbd_->registerCallback(
@@ -293,10 +293,10 @@ void MultiRigidNode::depthAndColorCb(
   // are equal
   camera_matrix_rgb_ = composeCameraMatrix(rgb_info_msg);
 
-  cv_bridge::CvImagePtr cv_rgb_ptr, cv_depth_ptr;
+  cv_bridge::CvImageConstPtr cv_rgb_ptr, cv_depth_ptr;
   try {
-    cv_rgb_ptr = cv_bridge::toCvCopy(rgb_msg, "bgr8");
-    cv_depth_ptr = cv_bridge::toCvCopy(depth_msg, depth_msg->encoding);
+    cv_rgb_ptr = cv_bridge::toCvShare(rgb_msg, "mono8");
+    cv_depth_ptr = cv_bridge::toCvShare(depth_msg);
   }
   catch (cv_bridge::Exception &e) {
     ROS_ERROR("cv_bridge exception: %s", e.what());
@@ -313,9 +313,9 @@ void MultiRigidNode::colorOnlyCb(
   // are equal
   camera_matrix_rgb_ = composeCameraMatrix(rgb_info_msg);
 
-  cv_bridge::CvImagePtr cv_rgb_ptr, cv_depth_ptr;
+  cv_bridge::CvImageConstPtr cv_rgb_ptr, cv_depth_ptr;
   try {
-    cv_rgb_ptr = cv_bridge::toCvCopy(rgb_msg, "bgr8");
+    cv_rgb_ptr = cv_bridge::toCvShare(rgb_msg, "mono8");
   }
   catch (cv_bridge::Exception &e) {
     ROS_ERROR("cv_bridge exception: %s", e.what());
@@ -325,29 +325,22 @@ void MultiRigidNode::colorOnlyCb(
   updatePose(cv_rgb_ptr, cv_depth_ptr, rgb_msg->header.frame_id);
 }
 
-void MultiRigidNode::updatePose(const cv_bridge::CvImagePtr &cv_rgb_ptr,
-                                const cv_bridge::CvImagePtr &cv_depth_ptr,
+void MultiRigidNode::updatePose(const cv_bridge::CvImageConstPtr &cv_rgb_ptr,
+                                const cv_bridge::CvImageConstPtr &cv_depth_ptr,
                                 const std::string &frame_id) {
   if ((!color_only_mode_) && (cv_depth_ptr == nullptr))
     throw std::runtime_error("MultiRigidNode::updatePose: received "
                              "nullptr depth while not in color_only_mode_\n");
 
-  // convert image to gray if required
-  cv::Mat img_gray;
-  if (cv_rgb_ptr->image.type() == CV_8UC3) {
-    cv::cvtColor(cv_rgb_ptr->image, img_gray, CV_BGR2GRAY);
-  } else if (cv_rgb_ptr->image.type() == CV_8UC1) {
-    img_gray = cv_rgb_ptr->image.clone();
-  } else {
+  if (cv_rgb_ptr->image.type() != CV_8UC1)
     throw std::runtime_error("MultiRigidNode::updatePose: image type "
-                             "should be CV_8UC3 or CV_8UC1\n");
-  }
+                             "should be CV_8UC1\n");
+  size_t width = cv_rgb_ptr->image.cols;
+  size_t height = cv_rgb_ptr->image.rows;
 
   // initialize detector thread if not yet active
   // the engine is created here since we need camera info
   if (detector_thread_ == nullptr) {
-    size_t width = img_gray.cols;
-    size_t height = img_gray.rows;
     detector_thread_ = std::unique_ptr<std::thread>(
         new std::thread(&MultiRigidNode::detectorThreadFunction, this,
                         camera_matrix_rgb_, width, height));
@@ -356,7 +349,7 @@ void MultiRigidNode::updatePose(const cv_bridge::CvImagePtr &cv_rgb_ptr,
   // copy the image for the detector (if running)
   if (detector_enabled_.load()) {
     std::lock_guard<std::mutex> lock(img_gray_detector_mutex_);
-    img_gray_detector_ = img_gray.clone();
+    img_gray_detector_ = cv_rgb_ptr->image.clone();
   }
 
   // initialize tracker engine if not yet active
@@ -364,8 +357,8 @@ void MultiRigidNode::updatePose(const cv_bridge::CvImagePtr &cv_rgb_ptr,
   if (multi_rigid_tracker_ == nullptr) {
     multi_rigid_tracker_ =
         interface::MultiRigidTracker::Ptr(new interface::MultiRigidTracker(
-            img_gray.cols, img_gray.rows, camera_matrix_rgb_, objects_,
-            parameters_flow_, parameters_pose_));
+            width, height, camera_matrix_rgb_, objects_, parameters_flow_,
+            parameters_pose_));
   }
 
   // update selected objects if new objects selected
@@ -390,9 +383,9 @@ void MultiRigidNode::updatePose(const cv_bridge::CvImagePtr &cv_rgb_ptr,
 
     // update tracker pose
     if (color_only_mode_)
-      multi_rigid_tracker_->updatePoses(img_gray);
+      multi_rigid_tracker_->updatePoses(cv_rgb_ptr->image);
     else
-      multi_rigid_tracker_->updatePoses(img_gray, cv_depth_ptr->image);
+      multi_rigid_tracker_->updatePoses(cv_rgb_ptr->image, cv_depth_ptr->image);
 
     // publish reliable poses
     std::vector<geometry_msgs::Pose> poses =
@@ -429,7 +422,7 @@ void MultiRigidNode::updatePose(const cv_bridge::CvImagePtr &cv_rgb_ptr,
 
     // generate output image
     cv::Mat texture = multi_rigid_tracker_->generateOutputImage(output_image_);
-    cv::Mat tmp_img = texture.clone();
+
     bool show_bounding_boxes = false;
     if (show_bounding_boxes) {
       auto bounding_boxes =
@@ -440,17 +433,14 @@ void MultiRigidNode::updatePose(const cv_bridge::CvImagePtr &cv_rgb_ptr,
             // draw in image
             auto p = cv::Point(bounding_boxes.at(object_index).at(r * 2),
                                bounding_boxes.at(object_index).at(r * 2 + 1));
-            cv::circle(tmp_img, p, 3, CV_RGB(255, 0, 0), -1, 8);
+            cv::circle(texture, p, 3, CV_RGB(255, 0, 0), -1, 8);
           }
         }
       }
     }
-    cv_bridge::CvImage cv_image;
-    cv_image.image = tmp_img;
-    cv_image.encoding = "rgba8";
-    sensor_msgs::Image ros_image;
-    cv_image.toImageMsg(ros_image);
-    debug_img_pub_.publish(ros_image);
+
+    debug_img_pub_.publish(
+        cv_bridge::CvImage(std_msgs::Header(), "rgba8", texture).toImageMsg());
 
     // record data to new file if requested
     if (recording_) {
