@@ -1,5 +1,5 @@
 <launch>
   <include file="$(find kinect2_bridge)/launch/kinect2_bridge.launch">
-    <arg name="base_name" value="kinect2_head" />
+  <arg name="depth_device" value="1" />
   </include>
 </launch>

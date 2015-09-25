@@ -295,7 +295,10 @@ void MultiRigidNode::depthAndColorCb(
 
   cv_bridge::CvImageConstPtr cv_rgb_ptr, cv_depth_ptr;
   try {
-    cv_rgb_ptr = cv_bridge::toCvShare(rgb_msg, "mono8");
+    if (rgb_msg->encoding == "8UC1") // fix for kinect2 mono output
+      cv_rgb_ptr = cv_bridge::toCvShare(rgb_msg);
+    else
+      cv_rgb_ptr = cv_bridge::toCvShare(rgb_msg, "mono8");
     cv_depth_ptr = cv_bridge::toCvShare(depth_msg);
   }
   catch (cv_bridge::Exception &e) {
@@ -315,7 +318,10 @@ void MultiRigidNode::colorOnlyCb(
 
   cv_bridge::CvImageConstPtr cv_rgb_ptr, cv_depth_ptr;
   try {
-    cv_rgb_ptr = cv_bridge::toCvShare(rgb_msg, "mono8");
+    if (rgb_msg->encoding == "8UC1") // fix for kinect2 mono output
+      cv_rgb_ptr = cv_bridge::toCvShare(rgb_msg);
+    else
+      cv_rgb_ptr = cv_bridge::toCvShare(rgb_msg, "mono8");
   }
   catch (cv_bridge::Exception &e) {
     ROS_ERROR("cv_bridge exception: %s", e.what());
@@ -335,15 +341,13 @@ void MultiRigidNode::updatePose(const cv_bridge::CvImageConstPtr &cv_rgb_ptr,
   if (cv_rgb_ptr->image.type() != CV_8UC1)
     throw std::runtime_error("MultiRigidNode::updatePose: image type "
                              "should be CV_8UC1\n");
-  size_t width = cv_rgb_ptr->image.cols;
-  size_t height = cv_rgb_ptr->image.rows;
 
   // initialize detector thread if not yet active
   // the engine is created here since we need camera info
   if (detector_thread_ == nullptr) {
-    detector_thread_ = std::unique_ptr<std::thread>(
-        new std::thread(&MultiRigidNode::detectorThreadFunction, this,
-                        camera_matrix_rgb_, width, height));
+    detector_thread_ = std::unique_ptr<std::thread>(new std::thread(
+        &MultiRigidNode::detectorThreadFunction, this, camera_matrix_rgb_,
+        cv_rgb_ptr->image.cols, cv_rgb_ptr->image.rows));
   }
 
   // copy the image for the detector (if running)
@@ -352,12 +356,35 @@ void MultiRigidNode::updatePose(const cv_bridge::CvImageConstPtr &cv_rgb_ptr,
     img_gray_detector_ = cv_rgb_ptr->image.clone();
   }
 
+  // rescale tracker image and adjust camera matrix if size differs from depth
+  // image, in this case the depth image size will dominate the conversion, this
+  // allows for using a high-res image for detection while still maintaining
+  // full frame rate for tracking
+  cv::Mat img_gray_tracker;
+  cv::Mat camera_matrix_rgb_tracker = camera_matrix_rgb_.clone();
+  if ((!color_only_mode_) &&
+      (cv_rgb_ptr->image.size() != cv_depth_ptr->image.size())) {
+    cv::resize(cv_rgb_ptr->image, img_gray_tracker, cv_depth_ptr->image.size());
+    // adjust camera matrix
+    double scale_x =
+        (double)cv_depth_ptr->image.cols / (double)cv_rgb_ptr->image.cols;
+    double scale_y =
+        (double)cv_depth_ptr->image.rows / (double)cv_rgb_ptr->image.rows;
+    camera_matrix_rgb_tracker.at<double>(0, 0) *= scale_x;
+    camera_matrix_rgb_tracker.at<double>(0, 2) *= scale_x;
+    camera_matrix_rgb_tracker.at<double>(1, 1) *= scale_y;
+    camera_matrix_rgb_tracker.at<double>(1, 2) *= scale_y;
+  } else {
+    img_gray_tracker = cv_rgb_ptr->image;
+  }
+
   // initialize tracker engine if not yet active
   // the engine is created here since we need camera info
   if (multi_rigid_tracker_ == nullptr) {
     multi_rigid_tracker_ =
         interface::MultiRigidTracker::Ptr(new interface::MultiRigidTracker(
-            width, height, camera_matrix_rgb_, objects_, parameters_flow_,
+            img_gray_tracker.cols, img_gray_tracker.rows,
+            camera_matrix_rgb_tracker, objects_, parameters_flow_,
             parameters_pose_));
   }
 
@@ -383,9 +410,9 @@ void MultiRigidNode::updatePose(const cv_bridge::CvImageConstPtr &cv_rgb_ptr,
 
     // update tracker pose
     if (color_only_mode_)
-      multi_rigid_tracker_->updatePoses(cv_rgb_ptr->image);
+      multi_rigid_tracker_->updatePoses(img_gray_tracker);
     else
-      multi_rigid_tracker_->updatePoses(cv_rgb_ptr->image, cv_depth_ptr->image);
+      multi_rigid_tracker_->updatePoses(img_gray_tracker, cv_depth_ptr->image);
 
     // publish reliable poses
     std::vector<geometry_msgs::Pose> poses =
