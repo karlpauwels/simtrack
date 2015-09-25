@@ -38,6 +38,7 @@
 #include <H5Cpp.h>
 #include <hdf5_file.h>
 #include <utilities.h>
+#include <Eigen/Dense>
 
 using namespace cv;
 
@@ -194,12 +195,8 @@ TranslationRotation3D D_MultipleRigidPoseSparse::estimatePose(const Mat &image,
 
     ModelAssets &model = _allModels.at(object);
 
-    //    util::TimerGPU timer;
-
     _siftEngine->RunSIFT(_n_cols, _n_rows, image.data, GL_LUMINANCE,
                          GL_UNSIGNED_BYTE);
-
-    //    double extract_time = timer.read();
 
     int n_image_features = _siftEngine->GetFeatureNum();
 
@@ -207,23 +204,47 @@ TranslationRotation3D D_MultipleRigidPoseSparse::estimatePose(const Mat &image,
                                           n_image_features);
     vector<SiftGPU::SiftKeypoint> img_positions(n_image_features);
 
-    _siftEngine->GetFeatureVector(&img_positions[0],
-                                  &img_feature_descriptors[0]);
+    _siftEngine->GetFeatureVector(img_positions.data(),
+                                  img_feature_descriptors.data());
+
+    const int one_d_texture_limit = 134217728;
+    if (model.model_size * n_image_features > one_d_texture_limit) {
+
+      // shuffling and downsampling image keypoints
+      int max_n_image_features = one_d_texture_limit / model.model_size - 1;
+
+      //      std::cout << "going to match " << model.model_size << " model to "
+      //                << n_image_features << " image features - max allowed
+      // image = "
+      //                << max_n_image_features << std::endl;
+
+      std::vector<int> shuffle_inds(n_image_features);
+      std::iota(shuffle_inds.begin(), shuffle_inds.end(), 0);
+      std::random_shuffle(shuffle_inds.begin(), shuffle_inds.end());
+
+      Eigen::Map<Eigen::VectorXi> shuffle_inds_eig(shuffle_inds.data(),
+                                                   n_image_features);
+      Eigen::Map<Eigen::MatrixXf> all_keypoints_eig(
+          (float *)img_positions.data(), 4, n_image_features);
+      Eigen::Map<Eigen::MatrixXf> all_descriptors_eig(
+          img_feature_descriptors.data(), _DESCRIPTOR_LENGTH, n_image_features);
+
+      Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic, int> p(
+          shuffle_inds_eig);
+      all_keypoints_eig = all_keypoints_eig * p;
+      all_descriptors_eig = all_descriptors_eig * p;
+
+      n_image_features = max_n_image_features;
+    }
 
     _matcherEngine->SetDescriptors(0, model.model_size,
-                                   &model.descriptors[0]); // model
+                                   model.descriptors.data()); // model
     _matcherEngine->SetDescriptors(1, n_image_features,
-                                   &img_feature_descriptors[0]); // image
-
-    //    timer.reset();
+                                   img_feature_descriptors.data()); // image
 
     // match and get result
     int num_match = _matcherEngine->GetSiftMatch(
         _max_matches, (int(*)[2])_match_buffer.data());
-
-    //    double match_time = timer.read();
-
-    //    printf("features %d - matches %d\n",n_image_features,num_match);
 
     // compute pnp
     vector<Point3f> objectPoints;
@@ -243,8 +264,6 @@ TranslationRotation3D D_MultipleRigidPoseSparse::estimatePose(const Mat &image,
     }
 
     const float max_dist = 1.0; // 1.0F
-
-    //    timer.reset();
 
     Mat rvec, tvec;
     vector<int> inliers_cpu;
