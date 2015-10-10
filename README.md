@@ -15,8 +15,8 @@ System Requirements
 
 * Ubuntu 12.04 or 14.04
 * ROS Hydro or Indigo
-* Installed and working [NVIDIA CUDA](https://developer.nvidia.com/cuda-downloads) driver and toolkit
-* CUDA-capable Graphics Processing Unit, Fermi class or above
+* Installed and working [NVIDIA CUDA](https://developer.nvidia.com/cuda-downloads) driver and toolkit (version 6.5 or above)
+* CUDA-capable Graphics Processing Unit (Fermi class or above)
 * Monocular camera or RGB-D sensor (Asus Xtion, Primesense, Kinect v1 or Kinect v2)
 
 Installation
