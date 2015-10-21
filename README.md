@@ -15,9 +15,12 @@ System Requirements
 
 * Ubuntu 12.04 or 14.04
 * ROS Hydro or Indigo
+* Monocular camera or RGB-D sensor (Asus Xtion, Primesense, Kinect v1 or Kinect v2)
 * Installed and working [NVIDIA CUDA](https://developer.nvidia.com/cuda-downloads) driver and toolkit (version 6.5 or above)
 * CUDA-capable Graphics Processing Unit (Fermi class or above)
-* Monocular camera or RGB-D sensor (Asus Xtion, Primesense, Kinect v1 or Kinect v2)
+  * [Two GPUs are recommended](http://www.karlpauwels.com/simtrack/performance-considerations/)
+  * Xtion-style sensors (640x480) require at least 1 GB of GPU memory (300 MB tracking, 700 MB detection) for the three example objects
+  * Kinect v2 sensors (1920x1080) require at least 3 GB of GPU memory (400 MB tracking at QHD, 2.2 GB detection at full HD). The resolution can be lowered for detection but this is not ideal.
 
 Installation
 ------------
@@ -50,7 +53,7 @@ rosdep install --from-paths src --ignore-src
 Build:
 ```
 cd ~/my-ws
-catkin_make
+catkin_make -DCMAKE_BUILD_TYPE="Release"
 ```
 
 Test
@@ -88,6 +91,10 @@ The default configuration uses *openni_2-launch* which supports Asus Xtion and P
 Run SimTrack:
 ```
 roslaunch simtrack_nodes main.launch
+```
+or if you're using a Kinect v2, and have the [driver](https://github.com/code-iai/iai_kinect2) installed:
+```
+roslaunch simtrack_nodes main_kinect2.launch
 ```
 
 The tracker output is available on the */simtrack/image* topic. It can be adjusted through *dynamic_reconfigure* to display either the tracker state or the optical flow.
