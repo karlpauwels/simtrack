@@ -161,7 +161,8 @@ int main(int argc, char **argv) {
 
     // apply tra_center -> rot_view to bounding box
     Eigen::Transform<double, 3, Eigen::Affine> t = rot_view * tra_center;
-    auto bb = t * bounding_box;
+    Eigen::Matrix<double, 3, 8> bb;
+    bb = t * bounding_box;
 
     // compute minimal z-shift required to ensure visibility
     // assuming cx,cy in image center
@@ -242,7 +243,8 @@ int main(int argc, char **argv) {
 
     // transform 3D keypoints to original 3D model coordinates
     Eigen::Map<Eigen::MatrixXf> key_XYZ_eig(key_XYZ.data(), 3, num_features);
-    auto tmp =
+    Eigen::MatrixXd tmp(3, num_features);
+    tmp =
         t_render.inverse() * key_XYZ_eig.cast<double>().colwise().homogeneous();
     key_XYZ_eig = tmp.cast<float>();
 
