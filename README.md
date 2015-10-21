@@ -9,6 +9,7 @@ For more details see the following paper:
 
 *Pauwels, Karl; Rubio, Leonardo; Ros, Eduardo (2015) [Real-time Pose Detection and Tracking of Hundreds of Objects](http://www.karlpauwels.com/downloads/tcsvt_2015/Pauwels_IEEE_TCSVT_2015.pdf). IEEE Transactions on Circuits and Systems for Video Technology, in press.*
 
+Please have a look at the two example videos of SimTrack in action, one showing [multiple object tracking with the Kinect v2](https://youtu.be/ewT2Ll6v9lU) and the other showing [object tracking with the PR2, while accounting for robot-object occlusion](https://youtu.be/mTbityMyR0E).
 
 System Requirements
 -------------------
