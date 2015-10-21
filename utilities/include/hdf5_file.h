@@ -230,6 +230,10 @@ void HDF5File::writeArray(const std::string &name,
     throw std::runtime_error(
         std::string("HDF5File::writeArray: inconsistent dims"));
 
+  if (n_elements == 0)
+    throw std::runtime_error(
+        std::string("HDF5File::writeArray: trying to write empty array"));
+
   // create dataspace
   std::vector<hsize_t> dims_hsize;
   for (const auto &dim : dims)
