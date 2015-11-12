@@ -9,7 +9,9 @@ For more details see the following paper:
 
 *Pauwels, Karl; Rubio, Leonardo; Ros, Eduardo (2015) [Real-time Pose Detection and Tracking of Hundreds of Objects](http://www.karlpauwels.com/downloads/tcsvt_2015/Pauwels_IEEE_TCSVT_2015.pdf). IEEE Transactions on Circuits and Systems for Video Technology, in press.*
 
-Please have a look at the two example videos of SimTrack in action, one showing [multiple object tracking with the Kinect v2](https://youtu.be/ewT2Ll6v9lU) and the other showing [object tracking with the PR2, while accounting for robot-object occlusion](https://youtu.be/mTbityMyR0E).
+Please have a look at these example videos of SimTrack in action:
+* [multiple object tracking with the Kinect v2](https://youtu.be/ewT2Ll6v9lU)
+* [object tracking with the PR2, accounting for robot-object occlusion](https://youtu.be/mTbityMyR0E).
 
 System Requirements
 -------------------
@@ -20,8 +22,8 @@ System Requirements
 * Installed and working [NVIDIA CUDA](https://developer.nvidia.com/cuda-downloads) driver and toolkit (version 6.5 or above)
 * CUDA-capable Graphics Processing Unit (Fermi class or above)
   * [Two GPUs are recommended](http://www.karlpauwels.com/simtrack/performance-considerations/)
-  * Xtion-style sensors (640x480) require at least 1 GB of GPU memory (300 MB tracking, 700 MB detection) for the three example objects
-  * Kinect v2 sensors (1920x1080) require at least 3 GB of GPU memory (400 MB tracking at QHD, 2.2 GB detection at full HD). The resolution can be lowered for detection but this is not ideal.
+  * Xtion-style sensors (640x480) require at least 1.3 GB of **free** GPU memory (300 MB tracking, 1 GB detection) for the three example objects. Use `nvidia-smi` to check memory usage.
+  * Kinect v2 sensors (1920x1080) require at least 2.6 GB of **free** GPU memory (400 MB tracking at QHD, 2.2 GB detection at full HD). The resolution can be lowered for detection but this is not ideal.
 
 Installation
 ------------
