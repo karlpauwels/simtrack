@@ -34,6 +34,7 @@
 #include <stdexcept>
 #include <opencv2/opencv.hpp>
 #include <hdf5_file.h>
+#include <utilities.h>
 #include <SiftGPU.h>
 #include <GL/gl.h>
 
@@ -60,14 +61,20 @@ int main(int argc, char **argv) {
   if (image_size.size() != 2)
     throw std::runtime_error("Expecting 2D uint8_t image");
 
+  int first_octave = in_file.checkVariableExists("first_octave")
+                         ? in_file.readScalar<int>("first_octave")
+                         : -1;
+
   /***********/
   /* PROCESS */
   /***********/
 
   SiftGPU sift_engine;
 
-  const char *argv_sift[] = { "-m", "-fo",   "-1",    "-s",    "-v",
-                              "0",  "-pack", "-cuda", "-maxd", "3840" };
+  const char *argv_sift[] = {
+    "-m", "-fo",   std::to_string(first_octave).c_str(), "-s",    "-v",
+    "0",  "-pack", "-cuda",                              "-maxd", "4608"
+  };
 
   int argc_sift = sizeof(argv_sift) / sizeof(char *);
   sift_engine.ParseParam(argc_sift, (char **)argv_sift);
@@ -75,9 +82,11 @@ int main(int argc, char **argv) {
   if (sift_engine.CreateContextGL() != SiftGPU::SIFTGPU_FULL_SUPPORTED)
     throw std::runtime_error("SIFT cannot create GL context");
 
+  util::TimerGPU timer;
   bool success =
       sift_engine.RunSIFT(image_size.at(1), image_size.at(0), image_data.data(),
                           GL_LUMINANCE, GL_UNSIGNED_BYTE);
+  std::cout << "SiftGPU time: " << timer.read() << " ms" << std::endl;
 
   if (!success)
     throw std::runtime_error("SIFT run failed");
