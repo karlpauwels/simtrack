@@ -34,10 +34,8 @@
 
 #include <memory>
 #include <translation_rotation_3d.h>
-#include <opencv2/opencv.hpp>
+#include <opencv2/core/core.hpp>
 #include <SiftGPU.h>
-
-using namespace cv;
 
 namespace pose {
 
@@ -61,11 +59,12 @@ public:
   void removeAllModels();
 
   // specify for which object the pose should be estimated
-  TranslationRotation3D estimatePoseSpecificObject(const Mat &image,
+  TranslationRotation3D estimatePoseSpecificObject(const cv::Mat &image,
                                                    const int object);
 
   // randomly select the object (probabilities can be tuned)
-  TranslationRotation3D estimatePoseRandomObject(const Mat &image, int &object);
+  TranslationRotation3D estimatePoseRandomObject(const cv::Mat &image,
+                                                 int &object);
 
   int getNumberOfObjects() { return (_n_objects); }
 
@@ -73,11 +72,11 @@ public:
   void disable() { _running = false; }
 
 private:
-  TranslationRotation3D estimatePose(const Mat &image, int object = 0);
+  TranslationRotation3D estimatePose(const cv::Mat &image, int object = 0);
 
   bool _running;
 
-  Mat _camera_mat;
+  cv::Mat _camera_mat;
   int _n_rows, _n_cols;
 
   const std::unique_ptr<SiftGPU> _siftEngine;
@@ -87,10 +86,10 @@ private:
 
   struct ModelAssets {
     int model_size;
-    vector<float> descriptors;
-    vector<SiftGPU::SiftKeypoint> positions;
+    std::vector<float> descriptors;
+    std::vector<SiftGPU::SiftKeypoint> positions;
   };
-  vector<ModelAssets> _allModels;
+  std::vector<ModelAssets> _allModels;
 
   int _n_objects;
 

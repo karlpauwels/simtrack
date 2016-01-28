@@ -16,8 +16,8 @@ material untextured
     
     pass
     {
-    # culling is required on the robot since the cameras are inside a structure!
-    # cull_hardware none
+    // culling is required on the robot since the cameras are inside a structure!
+    // cull_hardware none
       vertex_program_ref untextured_vert
       {
         param_named_auto worldViewProj worldviewproj_matrix

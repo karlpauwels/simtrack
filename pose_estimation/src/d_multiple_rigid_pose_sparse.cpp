@@ -39,8 +39,7 @@
 #include <hdf5_file.h>
 #include <utilities.h>
 #include <Eigen/Dense>
-
-using namespace cv;
+#include <opencv2/calib3d/calib3d.hpp>
 
 namespace pose {
 
@@ -48,11 +47,11 @@ D_MultipleRigidPoseSparse::D_MultipleRigidPoseSparse(
     int n_cols, int n_rows, float nodal_point_x, float nodal_point_y,
     float focal_length_x, float focal_length_y, int device_id, int vec_size,
     int num_iter_ransac)
-    : _running{ true }, _n_objects{ 0 }, _num_iter_ransac{ num_iter_ransac },
-      _max_matches{ 50000 }, _DESCRIPTOR_LENGTH{ 128 },
-      _siftEngine{ std::unique_ptr<SiftGPU>{ new SiftGPU() } },
-      _matcherEngine{ std::unique_ptr<SiftMatchGPU>{ new SiftMatchGPU(
-          4096 * vec_size) } } {
+    : _running{true}, _n_objects{0}, _num_iter_ransac{num_iter_ransac},
+      _max_matches{50000}, _DESCRIPTOR_LENGTH{128},
+      _siftEngine{std::unique_ptr<SiftGPU>{new SiftGPU()}},
+      _matcherEngine{
+          std::unique_ptr<SiftMatchGPU>{new SiftMatchGPU(4096 * vec_size)}} {
   _camera_mat.create(3, 3, CV_32F);
   updateCalibration(n_cols, n_rows, nodal_point_x, nodal_point_y,
                     focal_length_x, focal_length_y);
@@ -62,9 +61,9 @@ D_MultipleRigidPoseSparse::D_MultipleRigidPoseSparse(
 
   // allow for full hd with upscaling (2*1920 = 3840)
   // allow for 3K with upscaling (2*2304 = 4608)
-  const char *argv_template[] = { "-m",          "-fo",   "-1",    "-s",
-                                  "-v",          "0",     "-pack", "-cuda",
-                                  device_id_str, "-maxd", "4608" };
+  const char *argv_template[] = {"-m",          "-fo",   "-1",    "-s",
+                                 "-v",          "0",     "-pack", "-cuda",
+                                 device_id_str, "-maxd", "4608"};
   int argc = sizeof(argv_template) / sizeof(char *);
 
   char *argv[argc];
@@ -112,8 +111,7 @@ void D_MultipleRigidPoseSparse::addModel(const char *obj_filename) {
 
   // Read from HDF5-file
   std::vector<float> descriptors, positions;
-std:
-  vector<int> d_size, p_size;
+  std::vector<int> d_size, p_size;
   util::HDF5File f(obj_filename);
   f.readArray("descriptors", descriptors, d_size);
   f.readArray("positions", positions, p_size);
@@ -158,13 +156,13 @@ void D_MultipleRigidPoseSparse::removeAllModels() {
 }
 
 TranslationRotation3D
-D_MultipleRigidPoseSparse::estimatePoseSpecificObject(const Mat &image,
+D_MultipleRigidPoseSparse::estimatePoseSpecificObject(const cv::Mat &image,
                                                       const int object) {
   return estimatePose(image, object);
 }
 
 TranslationRotation3D
-D_MultipleRigidPoseSparse::estimatePoseRandomObject(const Mat &image,
+D_MultipleRigidPoseSparse::estimatePoseRandomObject(const cv::Mat &image,
                                                     int &object) {
   double obj_probabilities[_n_objects];
   for (int i = 0; i < _n_objects; i++)
@@ -186,8 +184,8 @@ D_MultipleRigidPoseSparse::estimatePoseRandomObject(const Mat &image,
   return estimatePose(image, object);
 }
 
-TranslationRotation3D D_MultipleRigidPoseSparse::estimatePose(const Mat &image,
-                                                              int object) {
+TranslationRotation3D
+D_MultipleRigidPoseSparse::estimatePose(const cv::Mat &image, int object) {
 
   TranslationRotation3D currPose;
 
@@ -200,9 +198,9 @@ TranslationRotation3D D_MultipleRigidPoseSparse::estimatePose(const Mat &image,
 
     int n_image_features = _siftEngine->GetFeatureNum();
 
-    vector<float> img_feature_descriptors(_DESCRIPTOR_LENGTH *
-                                          n_image_features);
-    vector<SiftGPU::SiftKeypoint> img_positions(n_image_features);
+    std::vector<float> img_feature_descriptors(_DESCRIPTOR_LENGTH *
+                                               n_image_features);
+    std::vector<SiftGPU::SiftKeypoint> img_positions(n_image_features);
 
     _siftEngine->GetFeatureVector(img_positions.data(),
                                   img_feature_descriptors.data());
@@ -247,8 +245,8 @@ TranslationRotation3D D_MultipleRigidPoseSparse::estimatePose(const Mat &image,
         _max_matches, (int(*)[2])_match_buffer.data());
 
     // compute pnp
-    vector<Point3f> objectPoints;
-    vector<Point2f> imagePoints;
+    std::vector<cv::Point3f> objectPoints;
+    std::vector<cv::Point2f> imagePoints;
 
     for (int i = 0; i < num_match; i++) {
       SiftGPU::SiftKeypoint &objectKey =
@@ -256,8 +254,9 @@ TranslationRotation3D D_MultipleRigidPoseSparse::estimatePose(const Mat &image,
       SiftGPU::SiftKeypoint &imageKey =
           img_positions[_match_buffer.at(i * 2 + 1)];
 
-      Point2f imagePoint(imageKey.x - _n_cols / 2, imageKey.y - _n_rows / 2);
-      Point3f objectPoint(objectKey.x, objectKey.y, objectKey.s);
+      cv::Point2f imagePoint(imageKey.x - _n_cols / 2,
+                             imageKey.y - _n_rows / 2);
+      cv::Point3f objectPoint(objectKey.x, objectKey.y, objectKey.s);
 
       objectPoints.push_back(objectPoint);
       imagePoints.push_back(imagePoint);
@@ -265,17 +264,17 @@ TranslationRotation3D D_MultipleRigidPoseSparse::estimatePose(const Mat &image,
 
     const float max_dist = 1.0; // 1.0F
 
-    Mat rvec, tvec;
-    vector<int> inliers_cpu;
+    cv::Mat rvec, tvec;
+    std::vector<int> inliers_cpu;
     if (objectPoints.size() > 4) {
-      solvePnPRansac(objectPoints, imagePoints, _camera_mat,
-                     Mat::zeros(1, 8, CV_32F), rvec, tvec, false,
-                     _num_iter_ransac, max_dist, objectPoints.size(),
-                     inliers_cpu, CV_P3P);
-      double T[] = { tvec.at<double>(0, 0), tvec.at<double>(0, 1),
-                     tvec.at<double>(0, 2) };
-      double R[] = { rvec.at<double>(0, 0), rvec.at<double>(0, 1),
-                     rvec.at<double>(0, 2) };
+      cv::solvePnPRansac(objectPoints, imagePoints, _camera_mat,
+                         cv::Mat::zeros(1, 8, CV_32F), rvec, tvec, false,
+                         _num_iter_ransac, max_dist, objectPoints.size(),
+                         inliers_cpu, CV_P3P);
+      double T[] = {tvec.at<double>(0, 0), tvec.at<double>(0, 1),
+                    tvec.at<double>(0, 2)};
+      double R[] = {rvec.at<double>(0, 0), rvec.at<double>(0, 1),
+                    rvec.at<double>(0, 2)};
       currPose = TranslationRotation3D(T, R);
     }
 

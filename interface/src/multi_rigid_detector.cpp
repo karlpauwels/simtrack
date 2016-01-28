@@ -39,7 +39,7 @@ namespace interface {
 
 MultiRigidDetector::MultiRigidDetector(int image_width, int image_height,
                                        cv::Mat camera_matrix,
-                                       std::vector<string> obj_filenames,
+                                       std::vector<std::string> obj_filenames,
                                        int device_id, Parameters parameters)
     : image_width_(image_width), image_height_(image_height),
       parameters_(parameters) {
@@ -59,7 +59,7 @@ MultiRigidDetector::MultiRigidDetector(int image_width, int image_height,
     d_multiple_rigid_pose_sparse_->addModel(it.c_str());
 }
 
-void MultiRigidDetector::estimatePose(const Mat &image, int object_index,
+void MultiRigidDetector::estimatePose(const cv::Mat &image, int object_index,
                                       pose::TranslationRotation3D &pose) {
   if (image.type() != CV_8UC1)
     throw std::runtime_error(std::string(
@@ -75,7 +75,7 @@ void MultiRigidDetector::estimatePose(const Mat &image, int object_index,
       image, object_index);
 }
 
-void MultiRigidDetector::estimatePose(const Mat &image, int object_index,
+void MultiRigidDetector::estimatePose(const cv::Mat &image, int object_index,
                                       geometry_msgs::Pose &pose) {
   pose::TranslationRotation3D pose_tr;
   estimatePose(image, object_index, pose_tr);
@@ -94,7 +94,7 @@ void MultiRigidDetector::estimatePose(const Mat &image, int object_index,
   pose.orientation.w = w;
 }
 
-void MultiRigidDetector::setCameraMatrix(const Mat &camera_matrix) {
+void MultiRigidDetector::setCameraMatrix(const cv::Mat &camera_matrix) {
   double nodal_point_x = camera_matrix.at<double>(0, 2);
   double nodal_point_y = camera_matrix.at<double>(1, 2);
   double focal_length_x = camera_matrix.at<double>(0, 0);

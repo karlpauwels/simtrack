@@ -32,7 +32,6 @@
 
 #pragma once
 
-#include <string>
 #include <OgreSceneManager.h>
 
 namespace render {
