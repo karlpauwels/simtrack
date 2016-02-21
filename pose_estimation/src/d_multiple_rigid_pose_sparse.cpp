@@ -205,8 +205,10 @@ D_MultipleRigidPoseSparse::estimatePose(const cv::Mat &image, int object) {
     _siftEngine->GetFeatureVector(img_positions.data(),
                                   img_feature_descriptors.data());
 
-    const int one_d_texture_limit = 134217728;
-    if (model.model_size * n_image_features > one_d_texture_limit) {
+    const unsigned long long one_d_texture_limit = 134217728;
+    if (static_cast<unsigned long long>(model.model_size) *
+            static_cast<unsigned long long>(n_image_features) >
+        one_d_texture_limit) {
 
       // shuffling and downsampling image keypoints
       int max_n_image_features = one_d_texture_limit / model.model_size - 1;
