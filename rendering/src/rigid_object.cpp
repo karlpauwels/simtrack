@@ -208,8 +208,8 @@ void RigidObject::computeBoundingBox() {
   vertices = real_eigenvectors.transpose() * vertices;
 
   // compute simple bounding box
-  auto mn = vertices.rowwise().minCoeff();
-  auto mx = vertices.rowwise().maxCoeff();
+  Eigen::Vector3d mn = vertices.rowwise().minCoeff();
+  Eigen::Vector3d mx = vertices.rowwise().maxCoeff();
   Eigen::Matrix<double, 3, 8> bounding_box;
   bounding_box << mn(0), mn(0), mn(0), mn(0), mx(0), mx(0), mx(0), mx(0), mn(1),
       mn(1), mx(1), mx(1), mn(1), mn(1), mx(1), mx(1), mn(2), mx(2), mn(2),

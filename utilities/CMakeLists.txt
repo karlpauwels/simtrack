@@ -22,7 +22,7 @@ endif()
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 
 catkin_package(
-  INCLUDE_DIRS include ${CUDA_INCLUDE_DIRS}
+  INCLUDE_DIRS include ${CUDA_INCLUDE_DIRS} ${HDF5_INCLUDE_DIRS}
   LIBRARIES ${PROJECT_NAME}
   DEPENDS hdf5 boost
 )

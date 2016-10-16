@@ -9,7 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 find_package(CUDA 6.5 REQUIRED)
 find_package(OpenGL REQUIRED)
-find_package(OpenCV 2.4.8 REQUIRED)
+find_package(OpenCV 3.1.0 REQUIRED)
 find_package(Eigen REQUIRED)
 add_definitions(${EIGEN_DEFINITIONS})
 find_package(urdfdom REQUIRED)
