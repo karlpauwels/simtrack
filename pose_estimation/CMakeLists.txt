@@ -9,7 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 find_package(CUDA 6.5 REQUIRED)
-find_package(Eigen REQUIRED)
+find_package(Eigen3 REQUIRED)
 add_definitions(${EIGEN_DEFINITIONS})
 
 set(GENCODE_SM20 -gencode=arch=compute_20,code=sm_20)

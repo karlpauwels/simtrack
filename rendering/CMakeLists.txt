@@ -10,7 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(CUDA 6.5 REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(OpenCV 3.1.0 REQUIRED)
-find_package(Eigen REQUIRED)
+find_package(Eigen3 REQUIRED)
 add_definitions(${EIGEN_DEFINITIONS})
 find_package(urdfdom REQUIRED)
 find_package(orocos_kdl REQUIRED)
@@ -107,7 +107,7 @@ catkin_package(
     ${PROJECT_NAME}
     ${OGRE_OV_LIBRARIES_ABS}
     ${urdfdom_LIBRARIES}
-  DEPENDS libx11-dev opengl libglew-dev cv_bridge orocos_kdl
+  DEPENDS orocos_kdl
   CATKIN_DEPENDS
     resource_retriever
     kdl_parser
