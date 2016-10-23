@@ -52,7 +52,7 @@ D_MultipleRigidPoseSparse::D_MultipleRigidPoseSparse(
       _siftEngine{std::unique_ptr<SiftGPU>{new SiftGPU()}},
       _matcherEngine{
           std::unique_ptr<SiftMatchGPU>{new SiftMatchGPU(4096 * vec_size)}} {
-  _camera_mat.create(3, 3, CV_32F);
+  _camera_mat.create(3, 3, CV_64F);
   updateCalibration(n_cols, n_rows, nodal_point_x, nodal_point_y,
                     focal_length_x, focal_length_y);
 
@@ -92,18 +92,17 @@ void D_MultipleRigidPoseSparse::updateCalibration(int n_cols, int n_rows,
   _n_cols = n_cols;
   _n_rows = n_rows;
 
-  // probably wrong!
-  _camera_mat.at<float>(0, 0) = focal_length_x;
-  _camera_mat.at<float>(0, 1) = 0.f;
-  _camera_mat.at<float>(0, 2) = nodal_point_x - _n_cols / 2.0;
+  _camera_mat.at<double>(0, 0) = focal_length_x;
+  _camera_mat.at<double>(0, 1) = 0.f;
+  _camera_mat.at<double>(0, 2) = nodal_point_x;
 
-  _camera_mat.at<float>(1, 0) = 0.f;
-  _camera_mat.at<float>(1, 1) = focal_length_y;
-  _camera_mat.at<float>(1, 2) = nodal_point_y - _n_rows / 2.0;
+  _camera_mat.at<double>(1, 0) = 0.f;
+  _camera_mat.at<double>(1, 1) = focal_length_y;
+  _camera_mat.at<double>(1, 2) = nodal_point_y;
 
-  _camera_mat.at<float>(2, 0) = 0.f;
-  _camera_mat.at<float>(2, 1) = 0.f;
-  _camera_mat.at<float>(2, 2) = 1.f;
+  _camera_mat.at<double>(2, 0) = 0.f;
+  _camera_mat.at<double>(2, 1) = 0.f;
+  _camera_mat.at<double>(2, 2) = 1.f;
 }
 
 void D_MultipleRigidPoseSparse::addModel(const char *obj_filename) {
@@ -256,8 +255,7 @@ D_MultipleRigidPoseSparse::estimatePose(const cv::Mat &image, int object) {
       SiftGPU::SiftKeypoint &imageKey =
           img_positions[_match_buffer.at(i * 2 + 1)];
 
-      cv::Point2f imagePoint(imageKey.x - _n_cols / 2,
-                             imageKey.y - _n_rows / 2);
+      cv::Point2f imagePoint(imageKey.x, imageKey.y);
       cv::Point3f objectPoint(objectKey.x, objectKey.y, objectKey.s);
 
       objectPoints.push_back(objectPoint);
@@ -266,17 +264,18 @@ D_MultipleRigidPoseSparse::estimatePose(const cv::Mat &image, int object) {
 
     const float max_dist = 1.0; // 1.0F
 
-    cv::Mat rvec, tvec;
     std::vector<int> inliers_cpu;
+    cv::Mat rvec = cv::Mat::zeros(3, 1, CV_64FC1);
+    cv::Mat tvec = cv::Mat::zeros(3, 1, CV_64FC1);
     if (objectPoints.size() > 4) {
       cv::solvePnPRansac(objectPoints, imagePoints, _camera_mat,
-                         cv::Mat::zeros(1, 8, CV_32F), rvec, tvec, false,
-                         _num_iter_ransac, max_dist, objectPoints.size(),
-                         inliers_cpu, CV_P3P);
-      double T[] = {tvec.at<double>(0, 0), tvec.at<double>(0, 1),
-                    tvec.at<double>(0, 2)};
-      double R[] = {rvec.at<double>(0, 0), rvec.at<double>(0, 1),
-                    rvec.at<double>(0, 2)};
+                         cv::Mat::zeros(4, 1, CV_64FC1), rvec, tvec, false,
+                         _num_iter_ransac, max_dist, .99,
+                         inliers_cpu, cv::SOLVEPNP_P3P);
+      double T[] = {tvec.at<double>(0), tvec.at<double>(1),
+                    tvec.at<double>(2)};
+      double R[] = {rvec.at<double>(0), rvec.at<double>(1),
+                    rvec.at<double>(2)};
       currPose = TranslationRotation3D(T, R);
     }
 
