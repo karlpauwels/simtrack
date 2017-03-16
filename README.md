@@ -16,8 +16,8 @@ Please have a look at these example videos of SimTrack in action:
 System Requirements
 -------------------
 
-* Ubuntu 12.04 or 14.04
-* ROS Hydro or Indigo
+* Ubuntu 12.04 or 14.04 (use the kinetic branch for Ubuntu 16.04)
+* ROS Hydro or Indigo (use the kinetic branch for Ros Kinetic)
 * Monocular camera or RGB-D sensor (Asus Xtion, Primesense, Kinect v1 or Kinect v2)
 * Installed and working [NVIDIA CUDA](https://developer.nvidia.com/cuda-downloads) driver and toolkit (version 6.5 or above)
 * CUDA-capable Graphics Processing Unit (Fermi class or above)
