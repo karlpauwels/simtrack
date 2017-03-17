@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   utilities
 )
 
+find_package(OpenCV 3.1.0 REQUIRED)
 find_package(CUDA 6.5 REQUIRED)
 find_package(Eigen3 REQUIRED)
 add_definitions(${EIGEN_DEFINITIONS})
@@ -47,6 +48,7 @@ add_custom_target(additional_files_${PROJECT_NAME} SOURCES
 include_directories(include
   ${catkin_INCLUDE_DIRS}
   ${EIGEN_INCLUDE_DIR}
+  ${OpenCV_INCLUDE_DIRS}
 )
 
 cuda_add_library(${PROJECT_NAME}
