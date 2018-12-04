@@ -45,6 +45,7 @@
 #include <utility_kernels_pose.h>
 #include <utilities.h>
 #include <utility_kernels.h>
+#include <numeric>
 
 int main(int argc, char **argv) {
 

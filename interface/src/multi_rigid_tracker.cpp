@@ -38,6 +38,7 @@
 #include <utility_kernels.h>
 #include <utility_kernels_pose.h>
 #include <hdf5.h>
+#include <numeric>
 
 using namespace util;
 
