@@ -46,6 +46,7 @@
 #include <translation_rotation_3d.h>
 #include <hdf5_file.h>
 #include <utilities.h>
+#include <numeric>
 
 using namespace util;
 
