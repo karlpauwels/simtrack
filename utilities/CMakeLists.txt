@@ -43,7 +43,7 @@ add_custom_target(additional_files_${PROJECT_NAME} SOURCES
 include_directories(include
   ${HDF5_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
-  ../../cub/
+  ../third_party/nvidia_cub/
 )
 
 cuda_add_library(${PROJECT_NAME}

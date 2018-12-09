@@ -39,12 +39,9 @@ RUN echo "${USERNAME} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 USER $USERNAME
 
 RUN source /opt/ros/kinetic/setup.sh && \
-    sudo apt-get update && \
-    sudo apt-get install -y python-wstool && \
     mkdir -p $WORKSPACE/src && \
-    curl -L -o $WORKSPACE/src/.rosinstall https://github.com/karlpauwels/simtrack/raw/master/simtrack.rosinstall && \
     cd $WORKSPACE/src && \
-    wstool update && \
+    git clone https://github.com/karlpauwels/simtrack.git && \
     cd $WORKSPACE && \
     if [ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]; then sudo rosdep init; fi && \
     rosdep update && \
