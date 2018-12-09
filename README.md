@@ -35,25 +35,15 @@ Source your ROS environment:
 source /opt/ros/kinetic/setup.sh
 ```
 
-Install wstool:
-```
-sudo apt-get install python-wstool
-```
-
 Create your workspace:
 ```
 mkdir -p ~/my-ws/src
 ```
 
-Copy the contents of [simtrack.rosinstall](simtrack.rosinstall) into a file ~/my-ws/src/.rosinstall:
-```
-curl -L -o ~/my-ws/src/.rosinstall https://github.com/karlpauwels/simtrack/raw/master/simtrack.rosinstall
-```
-
 Fetch the code:
 ```
 cd ~/my-ws/src
-wstool update
+git clone https://github.com/karlpauwels/simtrack.git
 ```
 
 Install the dependencies:
@@ -61,7 +51,7 @@ Install the dependencies:
 cd ~/my-ws
 sudo rosdep init # only if never run before
 rosdep update
-rosdep install --from-paths src --ignore-src
+rosdep install --from-paths src --ignore-src -y -r
 ```
 
 Build:

@@ -1,2 +1,0 @@
-- git: {local-name: cub, uri: 'https://github.com/NVlabs/cub.git', version: v1.8.0}
-- git: {local-name: simtrack, uri: 'https://github.com/karlpauwels/simtrack.git', version: master}

@@ -38,18 +38,17 @@ RUN echo "${USERNAME} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 USER $USERNAME
 
+RUN mkdir -p $WORKSPACE/src/simtrack
+
+# docker does not yet support environment-var expansion in command options
+COPY --chown=simtrack . $WORKSPACE/src/simtrack
+
+WORKDIR $WORKSPACE
+
 RUN source /opt/ros/kinetic/setup.sh && \
-    sudo apt-get update && \
-    sudo apt-get install -y python-wstool && \
-    mkdir -p $WORKSPACE/src && \
-    curl -L -o $WORKSPACE/src/.rosinstall https://github.com/karlpauwels/simtrack/raw/master/simtrack.rosinstall && \
-    cd $WORKSPACE/src && \
-    wstool update && \
-    cd $WORKSPACE && \
     if [ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]; then sudo rosdep init; fi && \
     rosdep update && \
     sudo apt-get update && \
     rosdep install --from-paths src --ignore-src -y -r && \
     sudo rm -rf /var/lib/apt/lists/*
 
-WORKDIR $WORKSPACE

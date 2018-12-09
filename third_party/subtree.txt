@@ -1,0 +1,1 @@
+git subtree add --squash --prefix third_party/nvidia_cub https://github.com/NVlabs/cub.git v1.8.0
