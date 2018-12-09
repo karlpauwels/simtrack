@@ -17,7 +17,7 @@ before_install:
   - sudo apt-get install -y docker-ce
   - sudo apt-get install -y nvidia-docker2
   - sudo pkill -SIGHUP dockerd
-  - docker build -t simtrack .
+  - docker build --build-arg COMMIT=$TRAVIS_COMMIT -t simtrack .
 
 script:
   - docker run --rm simtrack /bin/bash -c "source /opt/ros/kinetic/setup.sh && catkin_make -DCMAKE_BUILD_TYPE=\"Release\""
