@@ -1,6 +1,5 @@
 FROM nvidia/cuda:10.0-devel-ubuntu16.04
 
-ARG COMMIT
 ENV USERNAME simtrack
 ENV WORKSPACE /home/$USERNAME/my-ws/
 
@@ -39,17 +38,17 @@ RUN echo "${USERNAME} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 USER $USERNAME
 
+RUN mkdir -p $WORKSPACE/src/simtrack
+
+# docker does not yet support environment-var expansion in command options
+COPY --chown=simtrack . $WORKSPACE/src/simtrack
+
+WORKDIR $WORKSPACE
+
 RUN source /opt/ros/kinetic/setup.sh && \
-    mkdir -p $WORKSPACE/src && \
-    cd $WORKSPACE/src && \
-    git clone https://github.com/karlpauwels/simtrack.git && \
-    cd $WORKSPACE/src/simtrack && \
-    git reset --hard $COMMIT && \
-    cd $WORKSPACE && \
     if [ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]; then sudo rosdep init; fi && \
     rosdep update && \
     sudo apt-get update && \
     rosdep install --from-paths src --ignore-src -y -r && \
     sudo rm -rf /var/lib/apt/lists/*
 
-WORKDIR $WORKSPACE
